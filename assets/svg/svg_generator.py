@@ -8,7 +8,7 @@ block use group move to minimize the edit of svg
 dict update
 '''
 
-from assets.setting import block_setting as bs
+from assets.setting import block_setting as bs , svg_setting as ss
 from assets.block import block_data as bd
 from assets.svg import svg_type,svg_argument
 from assets.utils import random_str
@@ -36,7 +36,7 @@ def create_child(block_data,x=0,y=0,offsetx=0,offsety=0,id=None):
         dy = y+data.top+max(bs.content_top*2,(h-mh)/2)+offsety
         if hasattr(data,"_argument_data") and data.argument_data is not None:
             print("skibidi",dx, dy)
-            temp_data , temp_dict_data = create_child(data.argument_data,x,y,block_data.left+offsetx,max(bs.content_top*2,(h-mh)/2)+offsety,id=random_str.random_string())
+            temp_data , temp_dict_data = create_child(data.argument_data,0,0,block_data.left+offsetx,max(bs.content_top*2,(h-mh)/2)+offsety,id=random_str.random_string())
             child_data += temp_data
             children.append(temp_dict_data)
         elif hasattr(data,"_argument_data") and data.argument_data is None:
@@ -60,100 +60,40 @@ def create_child(block_data,x=0,y=0,offsetx=0,offsety=0,id=None):
         "y":y+offsety+block_data.top,
         "width":block_data.width,
         "height":block_data.height,
+        #add type to create interact
         "child": children
     }
-
 
     return hgw + datas + child_data + "\n" +tgw,dict_data
 
 
+def complete_svg(svg,svg_width,svg_height,connect_height,border_width):
+    svg_head = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{47.7109375}" height="{svg_height}" viewBox="-{border_width} -{connect_height} {svg_width} {svg_height}" fill="none">"""
 
-def z(block_data, x=0, y=0, parent_offset_x=0, parent_offset_y=0):
-    if block_data is None:
-        return "", None
+    svg_tail = "</svg>"
 
-    block_data.update()
-
-    # Calculate local transform
-    hgw = f"""<g transform="translate({x}, {y})">\n"""
-    datas = str(block_data) + "\n"
-
-    w = bs.content_pad
-    h = block_data.height - block_data.data.connect_height * 2
-
-    mh = max((item.height for item in block_data.child_data), default=0)
-    child_group_y = max(bs.content_top * 2, (h - mh) / 2)
-    child_svg = f"""<g transform="translate({block_data.left}, {child_group_y})">\n"""
-
-    dict_children = []
-
-    for data in block_data.child_data:
-        data.left = w
-        data.top = (mh - data.height) / 2
-        data.update()
-
-        # Absolute position = all parent offsets + local position
-        abs_x = parent_offset_x + x + block_data.left + data.left
-        abs_y = parent_offset_y + y + child_group_y + data.top
-
-        if isinstance(data, svg_argument.argument):
-            # Recursively get nested argument dictionary
-            if data.argument_data is not None:
-                child_svg_str, child_dict = z(
-                    data.argument_data,
-                    x, y,
-                    parent_offset_x=abs_x,
-                    parent_offset_y=abs_y
-                )
-                child_svg += child_svg_str
-            else:
-                child_dict = None
-
-            # Add argument to dictionary
-            dict_entry = {
-                "type": "argument",
-                "x": abs_x,
-                "y": abs_y,
-                "width": data.width,
-                "height": data.height,
-                "color": data.color
-            }
-            if child_dict:
-                dict_entry["children"] = [child_dict]
-
-            dict_children.append(dict_entry)
-
-        # Add SVG element
-        child_svg += str(data)
-        w += data.width
-
-    child_svg += "</g>\n"
-    tgw = "</g>"
-
-    svg_output = hgw + datas + child_svg + tgw
-
-    dict_output = None
-    if dict_children:
-        dict_output = {
-            "type": "block",
-            "x": parent_offset_x + x,
-            "y": parent_offset_y + y,
-            "width": block_data.width,
-            "height": block_data.height,
-            "children": dict_children
-        }
-
-    return svg_output, dict_output
-
+    return svg_head + svg + svg_tail
 
 
 def multiblock(block_datas,x=0,y=0):
     x= x
     y= y
+    mx = 0
+    bouding_list = []
+    svg_body = ""
     for block_data in block_datas:
-        create_child(block_data,x,y)
-        y += block_data.height
 
+        temp_svg,temp_bb = create_child(block_data,x,y)
+        bouding_list.append(temp_bb)
+        svg_body += temp_svg +"\n"
+
+        y += block_data.height - ss.connect_height[block_data.type] - ss.border_width[block_data.type]*2
+        mx = max(mx,block_data.width)
+
+    # post process
+    y += ss.border_width[1]*2
+    svg = complete_svg(svg_body,mx,y,ss.connect_height[1]*2+ss.border_width[1]*2,ss.border_width[1])
+    return svg , bouding_list , mx, y
 
 a = svg_argument.argument(30,20)
 p = svg_argument.argument(30,20)
@@ -173,5 +113,7 @@ l = bd.block_data(width=150,height=50,child=[svg_argument.Text("test"),
                                              svg_argument.argument(30,20)])
 l.update()
 
+import copy
+ds = [copy.deepcopy(l),copy.deepcopy(l),copy.deepcopy(l)]
 
-print(create_child(l)[1])
+print(multiblock(ds,0,0)[0])
