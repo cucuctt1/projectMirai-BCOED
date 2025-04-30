@@ -63,7 +63,6 @@ def create_child(block_data,x=0,y=0,offsetx=0,offsety=0,id=None):
         "child": children
     }
 
-
     return hgw + datas + child_data + "\n" +tgw,dict_data
 
 
