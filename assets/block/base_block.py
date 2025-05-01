@@ -1,7 +1,11 @@
 import flet as ft
+from sympy.tensor.tensor import contract_metric
+
 from assets.block import drag_module as dm
 from assets.debug.id_getter import *
 from assets.utils.random_str import *
+from assets.svg import svg_generator as sg
+from assets.control import interact_check as ic
 
 def impact_check(position_dict,point):
     px, py = point
@@ -17,7 +21,7 @@ class Base(dm.drag_module):
         self.height = height
         self.top = top
         self.left =left
-        self.block_dict = {}
+        self.block_dict = []
         self.block_data = []
         #self.block_data = sg.d
         self.id = random_string()
@@ -32,13 +36,27 @@ class Base(dm.drag_module):
         #self.test()
 
     def add(self,content):
-        self.content = content
-        self.update_dict()
-        self.updateWNH()
+        #string to svg
+        svg = ft.Image(src=content,width=self.width,height=self.height)
+        self.content = svg
+
 
 
     def add_data(self,block_data):
-        pass
+        self.block_data = block_data
+        content ,boudingbox,maxwidth,maxheight = sg.multiblock(block_data,0,0)
+        print(content)
+        self.width = maxwidth
+        self.height = maxheight
+        self.add(content)
+        self.block_dict = boudingbox
+
+    def update_content(self):
+        content, boudingbox, maxwidth, maxheight = sg.multiblock(self.block_data, 0, 0)
+        self.width = maxwidth
+        self.height = maxheight
+        self.add(content)
+        self.block_dict = boudingbox
 
     def updateWNH(self):
         self.width = self.content.width

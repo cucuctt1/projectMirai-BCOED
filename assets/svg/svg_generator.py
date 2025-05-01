@@ -68,9 +68,10 @@ def create_child(block_data,x=0,y=0,offsetx=0,offsety=0,id=None):
 
 
 def complete_svg(svg,svg_width,svg_height,connect_height,border_width):
-    svg_head = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{47.7109375}" height="{svg_height}" viewBox="-{border_width} -{connect_height} {svg_width} {svg_height}" fill="none">"""
+    svg_head = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{svg_width}" height="{svg_height}" fill="none">
+    <g transform="translate({border_width}, {connect_height+border_width*2})"> """
 
-    svg_tail = "</svg>"
+    svg_tail = "</g></svg>"
 
     return svg_head + svg + svg_tail
 
@@ -91,8 +92,8 @@ def multiblock(block_datas,x=0,y=0):
         mx = max(mx,block_data.width)
 
     # post process
-    y += ss.border_width[1]*2
-    svg = complete_svg(svg_body,mx,y,ss.connect_height[1]*2+ss.border_width[1]*2,ss.border_width[1])
+    y += ss.border_width[1]*2+ss.connect_height[1]+ss.border_width[1]*2
+    svg = complete_svg(svg_body,mx,y,ss.connect_height[1]*2,ss.border_width[1])
     return svg , bouding_list , mx, y
 
 a = svg_argument.argument(30,20)
@@ -116,4 +117,4 @@ l.update()
 import copy
 ds = [copy.deepcopy(l),copy.deepcopy(l),copy.deepcopy(l)]
 
-print(multiblock(ds,0,0)[0])
+#print(multiblock(ds,0,0)[1])
