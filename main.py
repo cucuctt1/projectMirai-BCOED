@@ -4,7 +4,7 @@ from  assets.viewer import block_display as BD
 import threading
 from assets.renderer.updater import *
 import time
-
+from assets.svg import svg_generator as sg
 
 def updatecycle(updater,sleeptime = 1/1000):
 
@@ -17,6 +17,7 @@ def main(page:ft.Page):
     block_dis = BD.block_display(1000, 1000)
     block = BB.Base(215,200,10,10,block_dis)
 
+    block.add_data(sg.ds)
 
     block_dis.installize(page, updater, "debug")
     updater.add_to_sector("debug", page)

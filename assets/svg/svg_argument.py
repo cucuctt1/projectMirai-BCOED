@@ -59,7 +59,7 @@ class argument():
 
 
         self.data = {
-            False: svg_type.svg_type(width=40, height=20, color=self.color, type=2, top=self.top,
+            False: svg_type.svg_type(width=30, height=20, color=self.color, type=2, top=self.top,
                                      left=self.left)
             , True: self._argument_data}
         if self._argument_data is not None:

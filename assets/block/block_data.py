@@ -21,12 +21,14 @@ class block_data:
         height = 0
         self.data.update()
         for child in self.child_data:
+            print(type(child),child.width)
             child.update()
             width += child.width
 
             height = max(child.height+ bs.content_top*2,height)
         height += self.data.connect_height*2 + self.data.border_width*2
-        self.width = width + bs.content_pad*2+10
+        print("blockdata width",width)
+        self.width = width +self.data.border_width*2+bs.content_pad*2
 
         self.height = max(height,50) if self.type == 1 else max(height,40)
         #print("data connect heiht", self.data.connect_height,self.height)
