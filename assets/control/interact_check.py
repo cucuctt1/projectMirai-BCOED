@@ -3,21 +3,19 @@
 #recusion to search for deepest
 #early return
 
-def interact_check(posx,posy,dict_data,cur_layer = 0,layer = []):
-
+def interact_check(posx,posy,dict_data,cur_layer = 0,inlayer = []):
     #bfs
     #check if inside bouding box
     x,x2 = dict_data["x"],dict_data["x"]+dict_data["width"]
     y,y2 = dict_data["y"],dict_data["y"]+dict_data["height"]
-    layer = layer
-    layer.append(cur_layer)
+    layer = inlayer
     self_impact = False
     child_impact = False
     if x <= posx <= x2 and y <= posy <= y2:
         self_impact = True
-
+        layer.append(cur_layer)
         for z_dept,child in enumerate(dict_data["child"]):
-            if child_impact is not True:
+            if not child_impact:
                 child_impact,layer = interact_check(posx,posy,child,z_dept,layer)
             else:
                 return child_impact ,layer
@@ -28,26 +26,33 @@ def interact_check(posx,posy,dict_data,cur_layer = 0,layer = []):
 example = {
     'x': 20,
     'y': 40,
-    'width': 25,
-    'height': 12,
+    'width': 100,
+    'height': 100,
     'child': [
         {
             'x': 30,
             'y': 60,
-            'width': 12,
-            'height': 6,
+            'width': 30,
+            'height': 30,
             'child': []
         },
         {
-            'x': 30,
+            'x': 90,
             'y': 60,
-            'width': 12,
-            'height': 6,
-            'child': []
+            'width': 30,
+            'height': 30,
+                    'child': [        {
+                    'x': 100,
+                    'y': 70,
+                    'width': 10,
+                    'height': 10,
+                    'child': []
+                }
+            ]
         }
     ]
 }
 
-pointx,pointy = 30,50
+pointx,pointy = 110,71
 
 print(interact_check(pointx,pointy,example))
