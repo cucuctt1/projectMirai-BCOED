@@ -102,9 +102,7 @@ def measure_path(d):
 def main():
     path_data = input()
     w, h, l = measure_path(path_data)
-    print(f"Width:  {w:.2f}px")
-    print(f"Height: {h:.2f}px")
-    print(f"Length: {l:.2f}px")
+
 
 if __name__ == '__main__':
     main()

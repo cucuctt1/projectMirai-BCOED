@@ -80,3 +80,6 @@ class drag_module(ft.GestureDetector):
         if self.content != None:
             self.height = self.content.height
             self.width = self.content.width
+
+
+
