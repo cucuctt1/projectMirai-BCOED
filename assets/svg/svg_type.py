@@ -31,7 +31,7 @@ class svg_type():
         tail_width2 = self.width-self.head_length-self.border_radius*2-(self.border_radius-2)*2-self.connect_length
         tail_width = self.width-self.head_length-self.border_radius*2-self.connect_length-(self.border_radius-2)*2-self.connect_width*2-10
 
-        print("tail width",tail_width,tail_width2)
+
 
         svg = f"""<path fill="{self.color}" d="
         M{self.left} {self.top}
@@ -62,7 +62,7 @@ class svg_type():
     def no_connect(self)->str:
         self.height -= self.border_width*2
         self.width -= self.border_width*2
-        print("noconnect",self.border_radius,self.width,self.height,self.width-self.border_radius*2)
+        #print("noconnect",self.border_radius,self.width,self.height,self.width-self.border_radius*2)
         svg  = f"""<path fill="{self.color}" d="
             M{self.left}
             {self.top}
@@ -108,7 +108,7 @@ class svg_type():
         return remove_newline.clean_text(svg)+"\n"
 
     def __str__(self):
-        print(self.width,self.height)
+        #print(self.width,self.height)
         return self.type_dict[self.type]
 
     def __add__(self, other):

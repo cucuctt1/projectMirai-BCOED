@@ -1,18 +1,13 @@
 import flet as ft
-from sympy.tensor.tensor import contract_metric
+
 
 from assets.block import drag_module as dm
 from assets.debug.id_getter import *
 from assets.utils.random_str import *
 from assets.svg import svg_generator as sg
 from assets.control import interact_check as ic
-
-def impact_check(position_dict,point):
-    px, py = point
-    for key, (x, y, x2, y2) in position_dict.items():
-        if x <= px <= x2 and y <= py <= y2:
-            return key,(x,y)
-    return None,(None,None)
+from assets.utils import element_filter as ele_fil
+from assets.svg import svg_argument as sa
 
 class Base(dm.drag_module):
     def __init__(self,width=150,height=50,left = 0,top =10,stack = None):
@@ -45,7 +40,7 @@ class Base(dm.drag_module):
     def add_data(self,block_data):
         self.block_data = block_data
         content ,boudingbox,maxwidth,maxheight = sg.multiblock(block_data,0,0)
-        print(content)
+
         self.width = maxwidth
         self.height = maxheight
         self.add(content)
@@ -68,16 +63,35 @@ class Base(dm.drag_module):
 
     def start_drag(self ,e):
 
-        point = e.global_x-self.left,e.global_y-self.top-15
+        px,py = e.global_x-self.left,e.global_y-self.top-5
         impact = None
         pos = (None,None)
-
+        #print(self.block_dict[0]["child"][0]["child"][0]["child"][0]["child"][0]["child"])
         if self.child is None:
-            impact,pos = impact_check(self.block_dict,point)
+            indice = 0
+            for data in self.block_dict:
+                impact,layer = ic.interact_check(px,py,data,0,[])
+                if impact:
+                    data = self.block_data[layer[0]]
+                    if len(layer) >= 2:
+                        for index in layer[1:]:
+                            data = data.child_data
+                            filterd_ele = ele_fil.filter(data,sa.argument)
+                            if filterd_ele[index].argument_data:
+                                data = filterd_ele[index].argument_data
+                            else:
+                                pass
+                    break
 
-        if impact ==0:
-            impact = None
+
+            #impact,pos = impact_check(self.block_dict,point)
+
+        if indice == 0:
+            indice = None
         if impact is not None and pos[0] is not None:
+
+            #get data
+
             splited_data = self.block_data[impact:]
             self.add_data(self.block_data[:impact])
             new_block = Base(width = self.width,height = self.height,left=self.left,top=pos[1]+self.top,stack=self.stack)
@@ -105,14 +119,15 @@ class Base(dm.drag_module):
             for item in self.stack.main_stack.controls:
                 if item != self:
                     #normalize the pos
-                    impact,pos = impact_check(item.block_dict,((self.left+10)-item.left,(self.top-15)-item.top))
-                    if impact is not None:
-                        block_data = item.block_data
-                        block_data[impact+1:impact+1] = self.block_data
-                        item.add_data(block_data)
-                        self.add_data([])
-
-                        break
+                    # impact,pos = impact_check(item.block_dict,((self.left+10)-item.left,(self.top-15)-item.top))
+                    # if impact is not None:
+                    #     block_data = item.block_data
+                    #     block_data[impact+1:impact+1] = self.block_data
+                    #     item.add_data(block_data)
+                    #     self.add_data([])
+                    #
+                    #     break
+                    pass
 
             super().end_drag(e)
         elif self.child is not None:

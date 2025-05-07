@@ -22,12 +22,13 @@ def create_child(block_data,x=0,y=0,offsetx=0,offsety=0,id=None):
     datas = str(block_data)+"\n"
     w = bs.content_pad
     h = block_data.height-block_data.data.connect_height*2
-    print(f"in id {id}" if id is not None else "")
+    #print(f"in id {id}" if id is not None else "")
     mh = 0
     for item in block_data.child_data:
         mh = max(mh,item.height)
     child_data = f"""<g transform="translate({block_data.left}, {max(bs.content_top*2,(h-mh)/2)})"> {"\n"}"""
     children = []
+    print(len(block_data.child_data))
     for data in block_data.child_data:
         data.left = w
         data.top = (mh-data.height)/2
@@ -35,24 +36,25 @@ def create_child(block_data,x=0,y=0,offsetx=0,offsety=0,id=None):
         dx = x+data.left+block_data.left+offsetx
         dy = y+data.top+max(bs.content_top*2,(h-mh)/2)+offsety
         if hasattr(data,"_argument_data") and data.argument_data is not None:
-            print("skibidi",dx, dy)
+
             temp_data , temp_dict_data = create_child(data.argument_data,0,0,block_data.left+offsetx,max(bs.content_top*2,(h-mh)/2)+offsety,id=random_str.random_string())
             child_data += temp_data
             children.append(temp_dict_data)
         elif hasattr(data,"_argument_data") and data.argument_data is None:
-            print("skibidi2", dx, dy,x,data.left,block_data.left,offsetx,w,f"out id {id}" if id is not None else "")
+            #print("skibidi2", dx, dy,x,data.left,block_data.left,offsetx,w,f"out id {id}" if id is not None else "")
             temp_dict_data = {
                 "x": dx,
                 "y": dy,
                 "width": block_data.width,
                 "height": block_data.height,
-                "child": children
+                "child": []
             }
             children.append(temp_dict_data)
             child_data += str(data)
         else:
             child_data += str(data)
         w += data.width
+    print("cp",len(children))
     child_data += "</g>"
     tgw = "</g>"
     dict_data = {
@@ -63,7 +65,7 @@ def create_child(block_data,x=0,y=0,offsetx=0,offsety=0,id=None):
         #add type to create interact
         "child": children
     }
-
+    print(len(dict_data["child"]))
     return hgw + datas + child_data + "\n" +tgw,dict_data
 
 
